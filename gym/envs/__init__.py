@@ -318,3 +318,11 @@ register(
     entry_point="gym.envs.mujoco.humanoidstandup_v4:HumanoidStandupEnv",
     max_episode_steps=1000,
 )
+
+# mobile robot environments
+# ----------------------------------------
+
+register(
+    id="Boxworld-v0",
+    entry_point="gym.envs.mobile_arrangement:BoxWorld",
+)
