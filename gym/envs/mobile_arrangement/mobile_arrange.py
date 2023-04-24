@@ -207,7 +207,14 @@ class BoxWorld(gym.Env):
         #     self.one_hot, self.color_and_type_binary_vect, self.backpack_onehot()]
         # only return the first person image and top down image
         assert self.bev_target is not None, "target image(bev_target) should not be none"
-        state = [self.fpv_prev, self.bev_target]
+        state=[self.fpv_curr, self.bev_target]
+        fpv_curr = self.fpv_curr.reshape((80,80,3))
+        # print(fpv_curr.shape)
+        img_bev = cv2.cvtColor(self.shortpath_BEV, cv2.COLOR_GRAY2BGR)
+        img_bev = cv2.resize(img_bev, (80, 80))
+        # print(img_bev.shape)
+        state = np.stack((fpv_curr, img_bev), axis=-1)
+        state = state.reshape((6, 80, 80))
         # print(self.pre_pos.shape)   # (3,)
         # print(self.curr_pos.shape)  # (3,)
         # print(self.fpv_prev.shape)  # (80,80,3)
