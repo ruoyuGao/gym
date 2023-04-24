@@ -6,7 +6,6 @@ import pybullet as p
 import numpy as np
 import matplotlib.pyplot as plt
 import gym
-from gym import spaces
 import cv2
 from scipy.ndimage import center_of_mass, rotate
 from typing import Optional
@@ -61,12 +60,9 @@ class BoxWorld(gym.Env):
         self.robot = None
         self.init_pos = [6,6,self.spawn_height]
         self.length = 12
-        self.action_space = spaces.box.Box(
-            low = np.array([0, 0], dtype=np.float32),
-            high = np.array([self.length, self.length], dtype=np.float32))
-        self.observation_space = spaces.box.Box(
-            low = np.array([0], dtype=np.float32),
-            high = np.array([255], dtype=np.float32))
+        self.observation_space = gym.spaces.Box(low=0, high=255, shape=(80, 80, 6), dtype=np.float32)
+        self.action_space = gym.spaces.Discrete(6)
+        self.reward_space = gym.spaces.Box(low=0, high=20, shape=(1,), dtype=np.float32)
         self.width = 0.1
         self.wall_height = 4
         self.objects = []
@@ -206,9 +202,12 @@ class BoxWorld(gym.Env):
             self.create_object_spm()
         # state=[self.pre_pos, self.curr_pos,\
         #     self.fpv_prev, self.fpv_curr, self.fpv_depth, self.output_spm, self.get_object_gtpose(), self.one_hot]
-        state=[self.pre_pos, self.curr_pos,\
-            self.fpv_prev, self.fpv_curr, self.fpv_depth, self.output_spm, self.get_object_gtpose(), \
-            self.one_hot, self.color_and_type_binary_vect, self.backpack_onehot()]
+        # state=[self.pre_pos, self.curr_pos,\
+        #     self.fpv_prev, self.fpv_curr, self.fpv_depth, self.output_spm, self.get_object_gtpose(), \
+        #     self.one_hot, self.color_and_type_binary_vect, self.backpack_onehot()]
+        # only return the first person image and top down image
+        assert self.bev_target is not None, "target image(bev_target) should not be none"
+        state = [self.fpv_prev, self.bev_target]
         # print(self.pre_pos.shape)   # (3,)
         # print(self.curr_pos.shape)  # (3,)
         # print(self.fpv_prev.shape)  # (80,80,3)
