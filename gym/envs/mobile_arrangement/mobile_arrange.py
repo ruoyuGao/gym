@@ -649,7 +649,6 @@ class BoxWorld(gym.Env):
         for i in range(self.num_objects):
             if i == self.backpack[1]: continue
             try:
-                print(p.getBasePositionAndOrientation(self.objects[i][0]))
                 pos, _ = p.getBasePositionAndOrientation(self.objects[i][0])
             except:
                 return -1
