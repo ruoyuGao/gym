@@ -210,8 +210,8 @@ class BoxWorld(gym.Env):
         state=[self.fpv_curr, self.bev_target]
         fpv_curr = self.fpv_curr.reshape((80,80,3))
         # print(fpv_curr.shape)
-        img_bev = cv2.cvtColor(self.shortpath_BEV, cv2.COLOR_GRAY2BGR)
-        img_bev = cv2.resize(img_bev, (80, 80))
+        bev_target = cv2.cvtColor(self.bev_target, cv2.COLOR_RGBA2RGB)
+        img_bev = cv2.resize(bev_target, (80, 80))
         # print(img_bev.shape)
         state = np.stack((fpv_curr, img_bev), axis=-1)
         state = state.reshape((6, 80, 80))
@@ -310,10 +310,13 @@ class BoxWorld(gym.Env):
         for i in range(self.num_objects):
             if i == self.backpack[1]: continue
             target_entity_pos = self.object_init_pos[i]
-            pos, _ = p.getBasePositionAndOrientation(self.objects[i][0])
-            entity_pos = [pos[0], pos[1], pos[2]]
-            dis_ = distance([target_entity_pos[0],target_entity_pos[1]],[entity_pos[0],entity_pos[1]])
-            dis += dis_
+            try:
+                pos, _ = p.getBasePositionAndOrientation(self.objects[i][0])
+                entity_pos = [pos[0], pos[1], pos[2]]
+                dis_ = distance([target_entity_pos[0],target_entity_pos[1]],[entity_pos[0],entity_pos[1]])
+                dis += dis_
+            except:
+                continue   
         return dis
 
     def trans(self,image):
@@ -645,7 +648,11 @@ class BoxWorld(gym.Env):
             return -1
         for i in range(self.num_objects):
             if i == self.backpack[1]: continue
-            pos, _ = p.getBasePositionAndOrientation(self.objects[i][0])
+            try:
+                print(p.getBasePositionAndOrientation(self.objects[i][0]))
+                pos, _ = p.getBasePositionAndOrientation(self.objects[i][0])
+            except:
+                return -1
             diff = math.sqrt((pos[0]-x)**2 +
                         (pos[1]-y)**2)
             radius = 0.5
